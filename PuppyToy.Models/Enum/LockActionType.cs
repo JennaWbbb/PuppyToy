@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PuppyToy.Models.Enum {
-    public enum LockActionType {
-
+﻿namespace PuppyToy.Models.Enum
+{
+    public enum LockActionType
+    {
         Invalid,
         SessionStart,
         SessionEnd,
@@ -18,7 +13,12 @@ namespace PuppyToy.Models.Enum {
         SelfAdded,
         ApiAdded,
         ApiRemoved,
-        WheelOfFortune
-
+        WheelOfFortune,
+        Voted,
+        InsufficientGames,
+        RemainingDuration,
+        HolderChanged,
+        HolderAdded,
+        HolderRemoved
     }
 }
