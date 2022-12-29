@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PuppyToy.Models.Enum;
+﻿using PuppyToy.Models.Enum;
 using PuppyToy.Models.Storable;
-using PuppyToy.Services.DataAccess;
 using PuppyToy.Services.Emlalock;
+using System.Diagnostics;
 
 namespace PuppyToy.ConsoleApp {
-    internal class Program {
-
-        private static object _locker = new object();
+    internal abstract class Program {
 
         public static EmlalockSession CurrentSession {
             get;
@@ -22,7 +12,7 @@ namespace PuppyToy.ConsoleApp {
         }
 
         public static void Main() {
-            Console.WriteLine( "Enter feed url: " );
+            Console.WriteLine( "Enter feed URL: " );
             string? url = Console.ReadLine();
             Debug.WriteLine( $"URL: {url}" );
             Run( url );
@@ -37,8 +27,7 @@ namespace PuppyToy.ConsoleApp {
                 try {
                     List<EmlalockFeedItem> result = reader.GetFeedItems().Result;
                     foreach( EmlalockFeedItem emlalockFeedItem in result ) {
-                        if( cache.TryAdd( emlalockFeedItem.ExternalId, emlalockFeedItem ) ) {
-                        }
+                        cache.TryAdd( emlalockFeedItem.ExternalId, emlalockFeedItem );
                     }
                     lastSuccessfulFetch = DateTime.Now;
                 } catch( Exception ex ) {
@@ -61,7 +50,6 @@ namespace PuppyToy.ConsoleApp {
 
                 Console.WriteLine();
 
-                //Console.WriteLine( $"Total time added: {totalDelta:hh\\:mm\\:ss}" );
                 Console.WriteLine( $"Session Start: {cache.Values.FirstOrDefault( v => v.ActionType == LockActionType.SessionStart )?.PupDate:g}" );
                 Console.WriteLine( $"Total time added: {totalDelta:g}" );
                 Thread.Sleep( 5000 );

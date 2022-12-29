@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PuppyToy.Models.Storable;
+using System.Diagnostics;
 
 namespace PuppyToy.Services.DataAccess {
     public class PuppyToyContext : DbContext {

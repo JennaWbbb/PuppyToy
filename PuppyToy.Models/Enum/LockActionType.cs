@@ -1,7 +1,5 @@
-﻿namespace PuppyToy.Models.Enum
-{
-    public enum LockActionType
-    {
+﻿namespace PuppyToy.Models.Enum {
+    public enum LockActionType {
         Invalid,
         SessionStart,
         SessionEnd,

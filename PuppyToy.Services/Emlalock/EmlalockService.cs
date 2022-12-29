@@ -3,12 +3,9 @@ using PuppyToy.Models.Storable;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace PuppyToy.Services.Emlalock
-{
-    public class EmlalockService
-    {
-        public ConcurrentDictionary<string, EmlalockFeedItem> FeedItems
-        {
+namespace PuppyToy.Services.Emlalock {
+    public class EmlalockService {
+        public ConcurrentDictionary<string, EmlalockFeedItem> FeedItems {
             get;
             set;
         } = new ConcurrentDictionary<string, EmlalockFeedItem>();
@@ -48,137 +45,119 @@ namespace PuppyToy.Services.Emlalock
 
         public event EventHandler<EmlalockEventArgs> OnHolderRemoved;
 
-        public EmlalockService(string? feedUrl)
-        {
-            _emlalockFeedReader = new EmlalockFeedReader(feedUrl);
+        public EmlalockService( string? feedUrl ) {
+            _emlalockFeedReader = new EmlalockFeedReader( feedUrl );
             OnNewFeedItem += OnOnNewFeedItem;
         }
 
-        public void StartTask()
-        {
-            if (_backgroundTask != null)
-            {
-                throw new ApplicationException("Task is already set");
+        public void StartTask() {
+            if( _backgroundTask != null ) {
+                throw new ApplicationException( "Task is already set" );
             }
 
-            _backgroundTask = Task.Run(Run, _cancellationTokenSource.Token);
+            _backgroundTask = Task.Run( Run, _cancellationTokenSource.Token );
         }
 
-        public void StopTask()
-        {
-            if (_backgroundTask == null)
-            {
-                throw new ApplicationException("Task is not set");
+        public void StopTask() {
+            if( _backgroundTask == null ) {
+                throw new ApplicationException( "Task is not set" );
             }
 
             _cancellationTokenSource.Cancel();
         }
 
-        private void OnOnNewFeedItem(object? sender, EmlalockEventArgs e)
-        {
-            switch (e.FeedItem.ActionType)
-            {
+        private void OnOnNewFeedItem( object? sender, EmlalockEventArgs e ) {
+            switch( e.FeedItem.ActionType ) {
                 case LockActionType.VoteAdded:
-                    OnNewAddVote?.Invoke(this, e);
-                    OnNewVote?.Invoke(this, e);
+                    OnNewAddVote?.Invoke( this, e );
+                    OnNewVote?.Invoke( this, e );
                     break;
 
                 case LockActionType.VoteRemoved:
-                    OnNewRemoveVote?.Invoke(this, e);
-                    OnNewVote?.Invoke(this, e);
+                    OnNewRemoveVote?.Invoke( this, e );
+                    OnNewVote?.Invoke( this, e );
                     break;
 
                 case LockActionType.Voted:
-                    OnNewVote?.Invoke(this, e);
+                    OnNewVote?.Invoke( this, e );
                     break;
 
                 case LockActionType.PilloryEntered:
-                    OnPilloryEntered?.Invoke(this, e);
+                    OnPilloryEntered?.Invoke( this, e );
                     break;
 
                 case LockActionType.PilloryAdded:
-                    OnPilloryVoted?.Invoke(this, e);
+                    OnPilloryVoted?.Invoke( this, e );
                     break;
 
                 case LockActionType.SelfAdded:
-                    OnSelfAdded?.Invoke(this, e);
+                    OnSelfAdded?.Invoke( this, e );
                     break;
 
                 case LockActionType.ApiAdded:
-                    OnApiAdded?.Invoke(this, e);
+                    OnApiAdded?.Invoke( this, e );
                     break;
 
                 case LockActionType.ApiRemoved:
-                    OnApiRemoved?.Invoke(this, e);
+                    OnApiRemoved?.Invoke( this, e );
                     break;
 
                 case LockActionType.WheelOfFortune:
-                    OnWheelOfFortune?.Invoke(this, e);
+                    OnWheelOfFortune?.Invoke( this, e );
                     break;
 
                 case LockActionType.InsufficientGames:
-                    OnInsufficientGames?.Invoke(this, e);
+                    OnInsufficientGames?.Invoke( this, e );
                     break;
 
                 case LockActionType.RemainingDuration:
-                    OnRemainingDuration?.Invoke(this, e);
+                    OnRemainingDuration?.Invoke( this, e );
                     break;
 
                 case LockActionType.HolderChanged:
-                    OnHolderChanged?.Invoke(this, e);
+                    OnHolderChanged?.Invoke( this, e );
                     break;
 
                 case LockActionType.HolderAdded:
-                    OnHolderAdded?.Invoke(this, e);
-                    OnHolderChanged?.Invoke(this, e);
+                    OnHolderAdded?.Invoke( this, e );
+                    OnHolderChanged?.Invoke( this, e );
                     break;
 
                 case LockActionType.HolderRemoved:
-                    OnHolderRemoved?.Invoke(this, e);
-                    OnHolderChanged?.Invoke(this, e);
+                    OnHolderRemoved?.Invoke( this, e );
+                    OnHolderChanged?.Invoke( this, e );
                     break;
             }
         }
 
-        private void Run()
-        {
-            while (true)
-            {
-                if (_cancellationTokenSource.IsCancellationRequested)
-                {
+        private void Run() {
+            while( true ) {
+                if( _cancellationTokenSource.IsCancellationRequested ) {
                     return;
                 }
 
-                try
-                {
+                try {
                     List<EmlalockFeedItem> result = _emlalockFeedReader.GetFeedItems().Result;
-                    foreach (EmlalockFeedItem emlalockFeedItem in result)
-                    {
-                        if (FeedItems.TryAdd(emlalockFeedItem.ExternalId, emlalockFeedItem))
-                        {
-                            OnNewFeedItem?.Invoke(this, new EmlalockEventArgs(emlalockFeedItem));
+                    foreach( EmlalockFeedItem emlalockFeedItem in result ) {
+                        if( FeedItems.TryAdd( emlalockFeedItem.ExternalId, emlalockFeedItem ) ) {
+                            OnNewFeedItem?.Invoke( this, new EmlalockEventArgs( emlalockFeedItem ) );
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
+                } catch( Exception ex ) {
+                    Debug.WriteLine( ex );
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(5));
+                Thread.Sleep( TimeSpan.FromSeconds( 5 ) );
             }
         }
     }
 
-    public class EmlalockEventArgs : EventArgs
-    {
-        public EmlalockFeedItem FeedItem
-        {
+    public class EmlalockEventArgs : EventArgs {
+        public EmlalockFeedItem FeedItem {
             get;
         }
 
-        public EmlalockEventArgs(EmlalockFeedItem feedItem)
-        {
+        public EmlalockEventArgs( EmlalockFeedItem feedItem ) {
             FeedItem = feedItem;
         }
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PuppyToy.Models.Enum;
+﻿using PuppyToy.Models.Enum;
 
 namespace PuppyToy.Models.Storable {
     public class EmlalockFeedItem : BaseStorable {
